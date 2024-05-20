@@ -63,6 +63,19 @@ const nations =
     israel: "Израиля"
 };
 
+const months =
+[
+    "января", "февраля", "марта",
+    "апреля", "мая", "июня",
+    "июля", "августа", "сентября",
+    "октября", "ноября", "декабря"
+];
+
+const ranks =
+[
+    "3-", "4 ", "5 ", "6 ", "7+"
+];
+
 let info = null;
 
 const MESSAGES =
@@ -114,7 +127,7 @@ client.once(Events.ClientReady, async () =>
 
 async function fetchInfo()
 {
-    const response = await fetch("https://script.google.com/macros/s/AKfycbxyQMThOMmK27oyssUpxa6G_EXENPWT-5PeUnDl-fwhqRb4Jaoo7bB_DdWvRmXKeMkT/exec");
+    const response = await fetch("https://script.google.com/macros/s/AKfycbxWFyYlThzw5sXAMczj72wRWvEz422Pwrz-tb8wyPn3R16kx7zJdQJCaOvYChIALSCu/exec");
     const responseText = await response.text();
     info = JSON.parse(responseText);
 }
@@ -159,11 +172,75 @@ setInterval(async () =>
 
 function marathonFunction()
 {
+    // Actual data
+
+    const currentDate = new Date();
+
+    const startDate = new Date(Date.UTC(currentDate.getUTCFullYear(), parseInt(info.startMonth) - 1, parseInt(info.startDay), parseInt(info.eventHour)));
+    const endDate = new Date(Date.UTC(new Date().getUTCFullYear() + (parseInt(info.startMonth) > parseInt(info.endMonth) ? 1 : 0), parseInt(info.endMonth) - 1, parseInt(info.endDay), parseInt(info.eventHour)));
+
+    const timeDifference = endDate.getTime() - startDate.getTime();
+    const durationInDays = timeDifference / (1000 * 60 * 60 * 24);
+    const durationInStages = Math.round(durationInDays / parseInt(info.daysPerStage));
+
+    const timeElapsed = currentDate.getTime() - startDate.getTime();
+    const isMarathonOver = timeElapsed > timeDifference;
+    const currentStage = Math.ceil(timeElapsed / (1000 * 60 * 60 * 24 * parseInt(info.daysPerStage)));
+
+    const stageEndTimestamp = startDate.getTime() + (1000 * 60 * 60 * 24 * parseInt(info.daysPerStage) * currentStage);
+    const remainingStageTime = stageEndTimestamp - currentDate.getTime();
+    const remainingStageDays = Math.floor(remainingStageTime / (1000 * 60 * 60 * 24));
+    const remainingStageHours = Math.floor(remainingStageTime / (1000 * 60 * 60)) - (remainingStageDays * 24);
+    const remainingStageMinutes = Math.floor(remainingStageTime / (1000 * 60)) - (remainingStageDays * 24 * 60) - (remainingStageHours * 60);
+
+    const modeMultipliers = [ parseFloat(info.multAB), parseFloat(info.multRB), parseFloat(info.multSB) ];
+    const rankMultipliers = [ parseFloat(info.multIII), parseFloat(info.multIV), parseFloat(info.multV), parseFloat(info.multVI), parseFloat(info.multVII) ];
+    const stageScore = parseInt(info.stageScore);
+    const couponScore = parseInt(info.couponScore);
+
+    const scores = [];
+    for (let mode = 0; mode < 3; mode++)
+    {
+        scores[mode] = [];
+        for (let rank = 0; rank < 5; rank++)
+        {
+            scores[mode][rank] = { stage: Math.ceil(stageScore / modeMultipliers[mode] / rankMultipliers[rank]), coupon: Math.ceil(couponScore / modeMultipliers[mode] / rankMultipliers[rank]) };
+        }
+    }
+
+    // Mental disorders
+
     const premium = clFeminine[info.class] ? premiumF[parseInt(info.premium)] : premiumM[parseInt(info.premium)];
-    const duration = "с " + info.startDay + "." + (info.startMonth.length > 1 ? "" : "0") + info.startMonth + " по " + info.endDay + "." + (info.endMonth.length > 1 ? "" : "0") + info.endMonth;
+    const duration = "Марафон проходит с " + info.startDay + " " + months[parseInt(info.startMonth) - 1] + " по " + info.endDay + " " + months[parseInt(info.endMonth) - 1] + "";
+    const rewardStageString = info.rewardStage + (info.rewardStage < 5 ? " этапа" : " этапов");
+    const currentStageString = "Текущий этап – **" + currentStage + "/" + durationInStages + "**";
+    const stageRemaining = "Продлится ещё " + remainingStageDays + " д " + remainingStageHours + " ч " + remainingStageMinutes + " м";
+
+    function asbn(n) // Add spaces before number (for 6 symbols)
+    {
+        if (n < 100000) return " ";
+        else return "";
+    }
+
+    //                 "RR XXXXXX XXXXXX XXXXXX"
+    const modeHeader = "Ранг АБ     РБ     СБ\n";
+    let stageScores = modeHeader;
+    let couponScores = modeHeader;
+    for (let rank = 0; rank < 5; rank++)
+    {
+        stageScores += ranks[rank];
+        couponScores += ranks[rank];
+        for (let mode = 0; mode < 3; mode++)
+        {
+            stageScores += " " + asbn(scores[mode][rank].stage) + scores[mode][rank].stage;
+            couponScores += " " + asbn(scores[mode][rank].coupon) + scores[mode][rank].coupon;
+        }
+        stageScores += "\n";
+        couponScores += "\n";
+    }
 
     const boosty = "[Boosty](https://boosty.to/solawk)";
-    const github = "[GitHub](https://github.com/solawk/wtlineup)";
+    const github = "[GitHub](https://github.com/solawk/wtmarathon)";
 
     const msg = new EmbedBuilder()
         .setTitle(info.name)
@@ -171,22 +248,14 @@ function marathonFunction()
 	    .setURL(info.wiki !== "" ? info.wiki : null)
         .setThumbnail(info.image !== "" ? info.image : null)
         .addFields(
-            { name: duration,
-                value: "6 этапов, техника открывается на 6-м",
-                inline: true },
-            /*{ name: availableIn + lineups.nextHours + hours + lineups.nextMinutes + minutes,
-                value: "[" + lineups.bottomNext + "](" + link(lineups.bottomNext) + ") и " + "[" + lineups.topNext + "](" + link(lineups.topNext) + ")",
-                inline: true },
-            { name: future,
-                value: futureLineupsString },
-            { name: asb,
-                value: aviaNowString,
-                inline: true },
-            { name: availableIn + lineups.aviaNextDays + days + lineups.aviaNextHours + hours + lineups.aviaNextMinutes + minutes,
-                value: aviaNextString,
-                inline: true },
-            { name: squadron,
-                value: squadronResetString + cycleDay },*/
+            {   name: duration,
+                value: "Наградная техника выдаётся за " + rewardStageString },
+            {   name: !isMarathonOver ? currentStageString : "**Марафон завершился!**",
+                value: !isMarathonOver ? stageRemaining : "Ожидайте нового гринда" },
+            {   name: "Очков на этап – **" + info.stageScore + "**",
+                value: "```" + stageScores + "```" },
+            {   name: "Очков на купон – **" + info.couponScore + "**",
+                value: "```" + couponScores + "```" },
             { name: " ",
                 value: boosty + ", " + github }
         )
