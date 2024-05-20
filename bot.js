@@ -6,7 +6,7 @@ let REFRESHTIME;
 let TOKEN;
 const INFOREFRESHTIME = 1 * 60 * 60 * 1000;
 
-const DEPLOYMENTCHANNELID = "1242114214261162046";
+const DEPLOYMENTCHANNELID = null;
 
 const premiumM = [ "Акционный", "Премиумный" ];
 const premiumF = [ "Акционная", "Премиумная" ];
@@ -80,7 +80,7 @@ let info = null;
 
 const MESSAGES =
 [
-    { ch: "1242114214261162046", msg: "1242118576937373726" }
+    { ch: "1242114214261162046", msg: "1242145311913410732" }
 ];
 
 try
