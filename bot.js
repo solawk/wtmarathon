@@ -6,7 +6,7 @@ let REFRESHTIME;
 let TOKEN;
 const INFOREFRESHTIME = 1 * 60 * 60 * 1000;
 
-const DEPLOYMENTCHANNELID = "1109917653075775600";
+const DEPLOYMENTCHANNELID = null;
 
 const premiumM = [ "Акционный", "Премиумный" ];
 const premiumF = [ "Акционная", "Премиумная" ];
@@ -80,7 +80,8 @@ let info = null;
 
 const MESSAGES =
 [
-    { ch: "1242114214261162046", msg: "1242145311913410732" }
+    { ch: "1242114214261162046", msg: "1242145311913410732" },
+    { ch: "1109917653075775600", msg: "1243257526901014578" }
 ];
 
 try
@@ -259,7 +260,7 @@ function marathonFunction()
             { name: " ",
                 value: boosty + ", " + github }
         )
-        .setFooter({ text: "by Solawk" });
+        .setFooter({ text: "от Solawk" });
 
     return msg;
 }
