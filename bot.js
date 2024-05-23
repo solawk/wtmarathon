@@ -6,7 +6,7 @@ let REFRESHTIME;
 let TOKEN;
 const INFOREFRESHTIME = 1 * 60 * 60 * 1000;
 
-const DEPLOYMENTCHANNELID = null;
+const DEPLOYMENTCHANNELID = "1109917653075775600";
 
 const premiumM = [ "Акционный", "Премиумный" ];
 const premiumF = [ "Акционная", "Премиумная" ];
