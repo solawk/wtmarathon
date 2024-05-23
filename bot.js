@@ -186,6 +186,7 @@ function marathonFunction()
 
     const timeElapsed = currentDate.getTime() - startDate.getTime();
     const isMarathonOver = timeElapsed > timeDifference;
+    const isMarathonNotStarted = currentDate < startDate;
     const currentStage = Math.ceil(timeElapsed / (1000 * 60 * 60 * 24 * parseInt(info.daysPerStage)));
 
     const stageEndTimestamp = startDate.getTime() + (1000 * 60 * 60 * 24 * parseInt(info.daysPerStage) * currentStage);
@@ -251,8 +252,8 @@ function marathonFunction()
         .addFields(
             {   name: duration,
                 value: "Наградная техника выдаётся за " + rewardStageString },
-            {   name: !isMarathonOver ? currentStageString : "**Марафон завершился!**",
-                value: !isMarathonOver ? stageRemaining : "Ожидайте нового гринда" },
+            {   name: !isMarathonOver ? (!isMarathonNotStarted ? currentStageString : "Марафон скоро начнётся") : "Марафон завершился!",
+                value: !isMarathonOver ? (!isMarathonNotStarted ? stageRemaining : "Готовьтесь к гринду") : "Ожидайте нового гринда" },
             {   name: "Очков на этап – **" + info.stageScore + "**",
                 value: "```" + stageScores + "```" },
             {   name: "Очков на купон – **" + info.couponScore + "**",
