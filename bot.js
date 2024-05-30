@@ -4,7 +4,7 @@ const fetch = require("cross-fetch");
 
 let REFRESHTIME;
 let TOKEN;
-const INFOREFRESHTIME = 1 * 60 * 60 * 1000;
+const INFOREFRESHTIME = 20 * 60 * 1000;
 
 const DEPLOYMENTCHANNELID = null;
 
@@ -80,7 +80,7 @@ let info = null;
 
 const MESSAGES =
 [
-    { ch: "1242114214261162046", msg: "1242145311913410732" },
+    { ch: "1058469561323749459", msg: "1141072037973078137" },
     { ch: "1109917653075775600", msg: "1243257526901014578" }
 ];
 
@@ -213,7 +213,8 @@ function marathonFunction()
     // Mental disorders
 
     const premium = clFeminine[info.class] ? premiumF[parseInt(info.premium)] : premiumM[parseInt(info.premium)];
-    const duration = "Марафон проходит с " + info.startDay + " " + months[parseInt(info.startMonth) - 1] + " по " + info.endDay + " " + months[parseInt(info.endMonth) - 1] + "";
+    const duration = "Марафон проходит с " + info.startDay + (info.startMonth !== info.endMonth ? " " + months[parseInt(info.startMonth) - 1] : "")
+                        + " по " + info.endDay + " " + months[parseInt(info.endMonth) - 1] + "";
     const rewardStageString = info.rewardStage + (info.rewardStage < 5 ? " этапа" : " этапов");
     const currentStageString = "Текущий этап – **" + currentStage + "/" + durationInStages + "**";
     const stageRemaining = "Продлится ещё " + remainingStageDays + " д " + remainingStageHours + " ч " + remainingStageMinutes + " м";
@@ -258,10 +259,9 @@ function marathonFunction()
                 value: "```" + stageScores + "```" },
             {   name: "Очков на купон – **" + info.couponScore + "**",
                 value: "```" + couponScores + "```" },
-            { name: " ",
+            { name: "от Solawk",
                 value: boosty + ", " + github }
-        )
-        .setFooter({ text: "от Solawk" });
+        );
 
     return msg;
 }
