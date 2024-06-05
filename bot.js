@@ -81,6 +81,7 @@ let info = null;
 const MESSAGES =
 [
     { ch: "1242114214261162046", msg: "1242145311913410732" },
+    { ch: "1058469561323749459", msg: "1141072037973078137" },
     { ch: "1109917653075775600", msg: "1243257526901014578" }
 ];
 
@@ -161,7 +162,7 @@ async function refreshStatusMessages()
 
         if (message == null) continue;
 
-        message.edit({ content: null, embeds: [ marathonFunction() ] });
+        message.edit({ content: null, embeds: [ marathonFunction() ] }).catch(() => { });
     }
 }
 
@@ -189,11 +190,16 @@ function marathonFunction()
     const isMarathonNotStarted = currentDate < startDate;
     const currentStage = Math.ceil(timeElapsed / (1000 * 60 * 60 * 24 * parseInt(info.daysPerStage)));
 
+    const stageStartTimestamp = startDate.getTime() + (1000 * 60 * 60 * 24 * parseInt(info.daysPerStage) * (currentStage - 1));
+    const stageTimeElapsed = currentDate.getTime() - stageStartTimestamp;
     const stageEndTimestamp = startDate.getTime() + (1000 * 60 * 60 * 24 * parseInt(info.daysPerStage) * currentStage);
+
     const remainingStageTime = stageEndTimestamp - currentDate.getTime();
     const remainingStageDays = Math.floor(remainingStageTime / (1000 * 60 * 60 * 24));
     const remainingStageHours = Math.floor(remainingStageTime / (1000 * 60 * 60)) - (remainingStageDays * 24);
     const remainingStageMinutes = Math.floor(remainingStageTime / (1000 * 60)) - (remainingStageDays * 24 * 60) - (remainingStageHours * 60);
+
+    const halfhourMinutes = (currentStage > 1 && stageTimeElapsed < (1000 * 60 * 30)) ? (30 - Math.floor(stageTimeElapsed / (1000 * 60))) : -1;
 
     const modeMultipliers = [ parseFloat(info.multAB), parseFloat(info.multRB), parseFloat(info.multSB) ];
     const rankMultipliers = [ parseFloat(info.multIII), parseFloat(info.multIV), parseFloat(info.multV), parseFloat(info.multVI), parseFloat(info.multVII) ];
@@ -217,7 +223,8 @@ function marathonFunction()
                         + " по " + info.endDay + " " + months[parseInt(info.endMonth) - 1] + "";
     const rewardStageString = info.rewardStage + (info.rewardStage < 5 ? " этапа" : " этапов");
     const currentStageString = "Текущий этап – **" + currentStage + "/" + durationInStages + "**";
-    const stageRemaining = "Продлится ещё " + remainingStageDays + " д " + remainingStageHours + " ч " + remainingStageMinutes + " м";
+    const stageRemaining = "До следующего " + remainingStageDays + " д " + remainingStageHours + " ч " + remainingStageMinutes + " м";
+    const halfhourRemaining = (halfhourMinutes > -1) ? "\nПредыдущий этап доступен ещё " + halfhourMinutes + " м" : "";
 
     function asbn(n) // Add spaces before number (for 6 symbols)
     {
@@ -254,7 +261,7 @@ function marathonFunction()
             {   name: duration,
                 value: "Наградная техника выдаётся за " + rewardStageString },
             {   name: !isMarathonOver ? (!isMarathonNotStarted ? currentStageString : "Марафон скоро начнётся") : "Марафон завершился!",
-                value: !isMarathonOver ? (!isMarathonNotStarted ? stageRemaining : "Готовьтесь к гринду") : "Ожидайте нового гринда" },
+                value: !isMarathonOver ? (!isMarathonNotStarted ? stageRemaining + halfhourRemaining : "Готовьтесь к гринду") : "Ожидайте нового гринда" },
             {   name: "Очков на этап – **" + info.stageScore + "**",
                 value: "```" + stageScores + "```" },
             {   name: "Очков на купон – **" + info.couponScore + "**",
