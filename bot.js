@@ -199,7 +199,7 @@ function marathonFunction()
     const remainingStageHours = Math.floor(remainingStageTime / (1000 * 60 * 60)) - (remainingStageDays * 24);
     const remainingStageMinutes = Math.floor(remainingStageTime / (1000 * 60)) - (remainingStageDays * 24 * 60) - (remainingStageHours * 60);
 
-    const halfhourMinutes = (currentStage > 1 && stageTimeElapsed < (1000 * 60 * 30)) ? (30 - Math.floor(stageTimeElapsed / (1000 * 60))) : -1;
+    const halfhourMinutes = (currentStage > 1 && currentStage <= (durationInStages + 1) && stageTimeElapsed < (1000 * 60 * 30)) ? (30 - Math.floor(stageTimeElapsed / (1000 * 60))) : -1;
 
     const modeMultipliers = [ parseFloat(info.multAB), parseFloat(info.multRB), parseFloat(info.multSB) ];
     const rankMultipliers = [ parseFloat(info.multIII), parseFloat(info.multIV), parseFloat(info.multV), parseFloat(info.multVI), parseFloat(info.multVII) ];
@@ -261,7 +261,7 @@ function marathonFunction()
             {   name: duration,
                 value: "Наградная техника выдаётся за " + rewardStageString },
             {   name: !isMarathonOver ? (!isMarathonNotStarted ? currentStageString : "Марафон скоро начнётся") : "Марафон завершился!",
-                value: !isMarathonOver ? (!isMarathonNotStarted ? stageRemaining + halfhourRemaining : "Готовьтесь к гринду") : "Ожидайте нового гринда" },
+                value: !isMarathonOver ? (!isMarathonNotStarted ? stageRemaining + halfhourRemaining : "Готовьтесь к гринду") : "Ожидайте нового гринда" + halfhourRemaining },
             {   name: "Очков на этап – **" + info.stageScore + "**",
                 value: "```" + stageScores + "```" },
             {   name: "Очков на купон – **" + info.couponScore + "**",
