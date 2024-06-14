@@ -223,7 +223,7 @@ function marathonFunction()
                         + " по " + info.endDay + " " + months[parseInt(info.endMonth) - 1] + "";
     const rewardStageString = info.rewardStage + (info.rewardStage < 5 ? " этапа" : " этапов");
     const currentStageString = "Текущий этап – **" + currentStage + "/" + durationInStages + "**";
-    const stageRemaining = "До следующего " + remainingStageDays + " д " + remainingStageHours + " ч " + remainingStageMinutes + " м";
+    const stageRemaining = "Продлится " + remainingStageDays + " д " + remainingStageHours + " ч " + remainingStageMinutes + " м";
     const halfhourRemaining = (halfhourMinutes > -1) ? "\nПредыдущий этап доступен ещё " + halfhourMinutes + " м" : "";
 
     function asbn(n) // Add spaces before number (for 6 symbols)
