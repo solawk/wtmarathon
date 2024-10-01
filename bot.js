@@ -11,6 +11,25 @@ const DEPLOYMENTCHANNELID = null;
 const premiumM = [ "Акционный", "Премиумный" ];
 const premiumF = [ "Акционная", "Премиумная" ];
 
+const dimensions =
+{
+    light: 0,
+    medium: 0,
+    heavy: 0,
+    spg: 0,
+    spaa: 0,
+    fighter: 1,
+    attacker: 1,
+    bomber: 1,
+    heli: 1,
+    barge: 2,
+    boat: 2,
+    chaser: 2,
+    destroyer: 2,
+    cruiser: 2,
+    battleship: 2,
+};
+
 const classes =
 {
     light: "лёгкий танк",
@@ -129,7 +148,7 @@ client.once(Events.ClientReady, async () =>
 
 async function fetchInfo()
 {
-    const response = await fetch("https://script.google.com/macros/s/AKfycbxWFyYlThzw5sXAMczj72wRWvEz422Pwrz-tb8wyPn3R16kx7zJdQJCaOvYChIALSCu/exec");
+    const response = await fetch("https://script.google.com/macros/s/AKfycbxQjCwoHuVz99y5TVllX0heOy1iMEcFRlh0qRXjwUV2pi2SpctktC3GYFcOXOpmG6LQ/exec");
     const responseText = await response.text();
     info = JSON.parse(responseText);
 }
@@ -201,7 +220,10 @@ function marathonFunction()
 
     const halfhourMinutes = (currentStage > 1 && currentStage <= (durationInStages + 1) && stageTimeElapsed < (1000 * 60 * 30)) ? (30 - Math.floor(stageTimeElapsed / (1000 * 60))) : -1;
 
-    const modeMultipliers = [ parseFloat(info.multAB), parseFloat(info.multRB), parseFloat(info.multSB) ];
+    const modeMultipliers = [   parseFloat(info.multGAB), parseFloat(info.multGRB), parseFloat(info.multGSB),
+                                parseFloat(info.multAAB), parseFloat(info.multARB), parseFloat(info.multASB),
+                                parseFloat(info.multNAB), parseFloat(info.multNRB), parseFloat(info.multGSB) ];
+    const currentDimension = dimensions[info.class];
     const rankMultipliers = [ parseFloat(info.multIII), parseFloat(info.multIV), parseFloat(info.multV), parseFloat(info.multVI), parseFloat(info.multVII) ];
     const stageScore = parseInt(info.stageScore);
     const couponScore = parseInt(info.couponScore);
@@ -209,10 +231,11 @@ function marathonFunction()
     const scores = [];
     for (let mode = 0; mode < 3; mode++)
     {
+        const modeMult = modeMultipliers[currentDimension * 3 + mode];
         scores[mode] = [];
         for (let rank = 0; rank < 5; rank++)
         {
-            scores[mode][rank] = { stage: Math.ceil(stageScore / modeMultipliers[mode] / rankMultipliers[rank]), coupon: Math.ceil(couponScore / modeMultipliers[mode] / rankMultipliers[rank]) };
+            scores[mode][rank] = { stage: Math.ceil(stageScore / modeMult / rankMultipliers[rank]), coupon: Math.ceil(couponScore / modeMult / rankMultipliers[rank]) };
         }
     }
 
@@ -242,8 +265,17 @@ function marathonFunction()
         couponScores += ranks[rank];
         for (let mode = 0; mode < 3; mode++)
         {
-            stageScores += " " + asbn(scores[mode][rank].stage) + scores[mode][rank].stage;
-            couponScores += " " + asbn(scores[mode][rank].coupon) + scores[mode][rank].coupon;
+            if (currentDimension === 2 && mode === 2)
+            {
+                // Naval SB
+                stageScores += " ------";
+                couponScores += " ------";
+            }
+            else
+            {
+                stageScores += " " + asbn(scores[mode][rank].stage) + scores[mode][rank].stage;
+                couponScores += " " + asbn(scores[mode][rank].coupon) + scores[mode][rank].coupon;
+            }
         }
         stageScores += "\n";
         couponScores += "\n";
