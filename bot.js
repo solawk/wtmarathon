@@ -92,7 +92,7 @@ const months =
 
 const ranks =
 [
-    "3-", "4 ", "5 ", "6 ", "7+"
+    "3-", "4-", "5 ", "6 ", "7+"
 ];
 
 let info = null;
@@ -259,7 +259,7 @@ function marathonFunction()
     const modeHeader = "Ранг АБ     РБ     СБ\n";
     let stageScores = modeHeader;
     let couponScores = modeHeader;
-    for (let rank = 0; rank < 5; rank++)
+    for (let rank = 1; rank < 5; rank++)
     {
         stageScores += ranks[rank];
         couponScores += ranks[rank];
