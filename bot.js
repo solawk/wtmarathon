@@ -283,6 +283,7 @@ function marathonFunction()
 
     const boosty = "[Boosty](https://boosty.to/solawk)";
     const github = "[GitHub](https://github.com/solawk/wtmarathon)";
+    const tg = "[Telegram](https://t.me/wtlineup)";
 
     const msg = new EmbedBuilder()
         .setTitle(info.name)
@@ -299,7 +300,7 @@ function marathonFunction()
             {   name: "Очков на купон – **" + info.couponScore + "**",
                 value: "```" + couponScores + "```" },
             { name: "от Solawk",
-                value: boosty + ", " + github }
+                value: boosty + ", " + github + ", " + tg }
         );
 
     return msg;
